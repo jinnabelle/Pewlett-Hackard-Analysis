@@ -36,6 +36,7 @@ FROM retirement_titles
 WHERE to_date = '9999-01-01'
 ORDER BY emp_no, to_date DESC;
 
+
 --16. retiring titles
 SELECT COUNT(emp_no) AS count_of
 , title
@@ -43,6 +44,7 @@ INTO retiring_titles
 FROM unique_emp
 GROUP BY title
 ORDER BY 1 DESC;
+
 
 --Delivery 2
 --1. employee info
@@ -70,7 +72,7 @@ SELECT DISTINCT ON (e.emp_no) e.emp_no,
 	de.to_date,
 	tt.title
 INTO mentorship_list
-FROM employees as e
+FROM employees as e		
 LEFT JOIN dept_emp as de
 ON e.emp_no = de.emp_no
 LEFT JOIN titles as tt
@@ -79,3 +81,38 @@ ON e.emp_no = tt.emp_no
 WHERE de.to_date = '9999-01-01' AND
 e.birth_date between '1965-01-01' and '1965-12-31'
 ORDER BY 1 ;
+
+
+--extra query; number of eligible employees to be mentored by department
+SELECT count(mm.emp_no) as ct
+, tt.dept_no
+, de.dept_name
+FROM mentorship_list mm
+INNER JOIN dept_emp tt
+ON mm.emp_no = tt.emp_no
+INNER JOIN departments de
+ON tt.dept_no = de.dept_no
+WHERE tt.to_date = '9999-01-01'
+GROUP BY 2,3
+ORDER BY 2 desc;
+
+--extra query; number of eligible retiring employees to mentor by department
+SELECT count(mm.emp_no) as ct
+, tt.dept_no
+, de.dept_name
+FROM unique_emp mm
+INNER JOIN dept_emp tt
+ON mm.emp_no = tt.emp_no
+INNER JOIN departments de
+ON tt.dept_no = de.dept_no
+WHERE tt.to_date = '9999-01-01'
+GROUP BY 2,3
+ORDER BY 2 desc;
+
+--total current employees
+SELECT COUNT(mm.emp_no)
+FROM employees mm
+INNER JOIN dept_emp tt
+ON mm.emp_no = tt.emp_no
+WHERE tt.to_date = '9999-01-01';
+
